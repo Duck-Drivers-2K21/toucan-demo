@@ -5,16 +5,7 @@ import numpy as np
 
 TABLE_NAME = 'toucan-dynamoDB2'
 WEBCAM_ID = "36:8f:3b:e1:44:db"
-
-# * Query...
-# Key condition expression & expression attribute values
-# kce = 'WebcamID = :wc_id and TOD >= :tod'
-# tod = str(int(time.time() - 60))  # time of day
-# eav = {':wc_id': {'S': '36:8f:3b:e1:44:db'}, ':tod': {'N': tod}}
-# response = dynamodb.query(TableName=table_name, KeyConditionExpression=kce, ExpressionAttributeValues=eav)
-# for item in response['Items']:
-#   print(item, type(item))
-
+BUCKET_NAME = 'toucan-data'
 
 def fetch_entries(N: int) -> list:
   """
@@ -38,7 +29,6 @@ def get_image(key: str) -> np.ndarray:
   Returns:
   - A NumPy array representing the decoded image.
   """
-  BUCKET_NAME = 'toucan-data'
   s3 = boto3.client('s3')
   img_data = s3.get_object(Bucket=BUCKET_NAME, Key=key)['Body'].read()
   np_img = np.frombuffer(img_data, np.uint8)
@@ -51,3 +41,13 @@ if __name__ == '__main__':
     tod = entries[i]['TOD']
     img = get_image(entries[i]['image_uuid'])
     cv2.imwrite(f"img_{tod}.png", img)
+
+
+# * To do a query based on time of day use below approach
+# Key condition expression & expression attribute values
+# kce = 'WebcamID = :wc_id and TOD >= :tod'
+# tod = str(int(time.time() - 60))  # time of day
+# eav = {':wc_id': {'S': '36:8f:3b:e1:44:db'}, ':tod': {'N': tod}}
+# response = dynamodb.query(TableName=table_name, KeyConditionExpression=kce, ExpressionAttributeValues=eav)
+# for item in response['Items']:
+#   print(item, type(item))
