@@ -1,13 +1,11 @@
 import boto3
 from boto3.dynamodb.conditions import Key
-import cv2
-from time import sleep
 import numpy as np
 
 TABLE_NAME = 'toucan-dynamoDB2'
-WEBCAM_ID = "36:8f:3b:e1:44:db"
+WEBCAM_ID = "5f:4b:0e:01:5f:e4"  # "36:8f:3b:e1:44:db"
 BUCKET_NAME = 'toucan-data'
-WAIT = 20  # Wait time before polling in seconds
+WAIT = 2  # Wait time before polling in seconds
 
 def fetch_entries(N: int) -> list:
   """
@@ -44,7 +42,8 @@ if __name__ == '__main__':
       entry = fetch_entries(1)[0]
       tod = entry['TOD']
       if tod == prev_tod:
-        sleep(WAIT)
+        cv2.waitKey(WAIT)
+        # sleep(WAIT)
         continue
       prev_tod = tod
       print(f"New image received! ({tod})")
@@ -53,7 +52,6 @@ if __name__ == '__main__':
       img_name = f'image-{tod}'
       cv2.imwrite(f'{img_name}.png', img)
       cv2.imshow(img_name, img)
-      cv2.waitKey(1)
   except KeyboardInterrupt:
     print("\nExiting.")
 
