@@ -39,19 +39,23 @@ def get_image(key: str) -> np.ndarray:
 
 if __name__ == '__main__':
   prev_tod = 0
-  while True:
-    entry = fetch_entries(1)[0]
-    tod = entry['TOD']
-    if tod == prev_tod:
-      sleep(WAIT)
-      continue
-    prev_tod = tod
-    print(f"New image received! ({tod})")
-    img = get_image(entry['image_uuid'])
-    cv2.destroyAllWindows()
-    cv2.imshow(f'image - {tod}', img)
-    cv2.waitKey(1)
-
+  try:
+    while True:
+      entry = fetch_entries(1)[0]
+      tod = entry['TOD']
+      if tod == prev_tod:
+        sleep(WAIT)
+        continue
+      prev_tod = tod
+      print(f"New image received! ({tod})")
+      img = get_image(entry['image_uuid'])
+      cv2.destroyAllWindows()
+      img_name = f'image-{tod}'
+      cv2.imwrite(f'{img_name}.png', img)
+      cv2.imshow(img_name, img)
+      cv2.waitKey(1)
+  except KeyboardInterrupt:
+    print("\nExiting.")
 
 
 # * To do a query based on time of day use below approach
