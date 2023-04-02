@@ -1,11 +1,13 @@
 import boto3
 from boto3.dynamodb.conditions import Key
 import cv2
+from time import sleep
 import numpy as np
 
 TABLE_NAME = 'toucan-dynamoDB2'
 WEBCAM_ID = "36:8f:3b:e1:44:db"
 BUCKET_NAME = 'toucan-data'
+WAIT = 20  # Wait time before polling in seconds
 
 def fetch_entries(N: int) -> list:
   """
@@ -36,11 +38,20 @@ def get_image(key: str) -> np.ndarray:
 
 
 if __name__ == '__main__':
-  entries = fetch_entries(1)
-  for i in range(len(entries)):
-    tod = entries[i]['TOD']
-    img = get_image(entries[i]['image_uuid'])
-    cv2.imwrite(f"img_{tod}.png", img)
+  prev_tod = 0
+  while True:
+    entry = fetch_entries(1)[0]
+    tod = entry['TOD']
+    if tod == prev_tod:
+      sleep(WAIT)
+      continue
+    prev_tod = tod
+    print(f"New image received! ({tod})")
+    img = get_image(entry['image_uuid'])
+    cv2.destroyAllWindows()
+    cv2.imshow(f'image - {tod}', img)
+    cv2.waitKey(1)
+
 
 
 # * To do a query based on time of day use below approach
