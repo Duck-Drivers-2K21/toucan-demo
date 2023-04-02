@@ -27,7 +27,7 @@ def fetch_entries(N: int) -> list:
   dynamodb = boto3.resource('dynamodb')
   table = dynamodb.Table(TABLE_NAME)
   return table.query(KeyConditionExpression=Key('WebcamID').eq(WEBCAM_ID),
-    ScanIndexForward=False, Limit=5)['Items']
+    ScanIndexForward=False, Limit=N)['Items']
 
 
 def get_image(key: str) -> np.ndarray:
@@ -47,8 +47,7 @@ def get_image(key: str) -> np.ndarray:
 
 if __name__ == '__main__':
   entries = fetch_entries(1)
-  for i in range(len(entries) - 1, -1, -1):
+  for i in range(len(entries)):
     tod = entries[i]['TOD']
     img = get_image(entries[i]['image_uuid'])
-    cv2.imshow(str(tod), img)
-    cv2.waitKey(0)
+    cv2.imwrite(f"img_{tod}.png", img)
