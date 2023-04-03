@@ -1,5 +1,6 @@
 import boto3
 from boto3.dynamodb.conditions import Key
+import cv2
 import numpy as np
 
 TABLE_NAME = 'toucan-dynamoDB2'
@@ -50,7 +51,7 @@ if __name__ == '__main__':
       img = get_image(entry['image_uuid'])
       cv2.destroyAllWindows()
       img_name = f'image-{tod}'
-      cv2.imwrite(f'{img_name}.png', img)
+      # cv2.imwrite(f'{img_name}.png', img)
       cv2.imshow(img_name, img)
   except KeyboardInterrupt:
     print("\nExiting.")
